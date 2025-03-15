@@ -1,0 +1,59 @@
+# WELCOME TO RAFT!
+#
+# This guide is meant to be a starting point for creating RAFT scripts.
+# For additional information, please see the README and provided "raft_docs" scripts.
+#
+# Let's begin with the basics:
+#
+# Comments begin with #, so any line starting with # is ignored 
+#
+# A paragraph (separated by empty lines) within a text file is a "block". 
+# This is the typical format for a block:
+
+@raft_docs_block_name
+# Some comments below the block name, if desired
+# ...
+PRINT hello world
+
+# The command above uses the "PRINT" command to simply print 
+# all the text that follows (in this case, "hello world")
+# The name of the block must be the first line of the block and
+# must start with an @
+#
+# If a block does not start with a name, it is considered unnamed
+# and simply executed when encountered. Under normal circumstances,
+# that's not the intended behavior, so all blocks should be given a name.
+#
+# Named blocks are called (triggered) as follows:
+
+@raft_docs_print_hello_world
+raft_docs_block_name
+
+# In the example above, the "raft_docs_print_hello_world" block triggers
+# the "hello world" print by simply entering its name in the block body.
+#
+# Blocks can also take variables in $variableName format:
+
+@raft_docs_custom_printer
+$toPrint
+PRINT $toPrint
+
+# These blocks can be called with:
+
+@raft_docs_custom_printer_caller
+raft_docs_custom_printer $toPrint="hello world"
+
+# Or even take arguments of their own and pass them through to other 
+# functions:
+
+@raft_docs_custom_printer_other_caller
+$toPrint
+raft_docs_custom_printer $toPrint=$toPrint
+
+# For a detailed guide, please see the functions_and_variables documentation.
+# 
+# Now, let's use this basic structure to create some actual scripts!
+#
+# TODO -- endpoints, basic commands, how to run
+
+
