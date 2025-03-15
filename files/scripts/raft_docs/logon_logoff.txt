@@ -1,0 +1,54 @@
+# LOGON & LOGOFF
+# OPTIONS: ALIAS, HOST, FIX_VERSION, SETTINGS
+
+@fix_docs_baseline_logon_logoff
+# Baseline BGC (uses default server -- currently bgccdev1, but this might change)
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC
+FIX_LOGOFF qa.tradera
+
+@fix_docs_baseline_logon_with_alias
+# With Alias
+$alias=qa.tradera
+FIX_LOGON $alias p PFXO_IPV_MD1 BGC
+FIX_LOGOFF $alias
+
+@fix_docs_baseline_logon_with_host
+# With Host: Remember, you need to use a BGC host for BGC Target_Comp, and vice versa for GFI
+$host=bgccdev1
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC -H $host
+FIX_LOGOFF qa.tradera
+
+@fix_docs_baseine_logon_with_fix_version
+# With Fix Version
+$fixVersion=4.4
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC -V $fixVersion
+FIX_LOGOFF qa.tradera
+
+@fix_docs_baseline_logon_with_settings_file
+# With Settings: This allows a user to specify their own unique settings if the defaults do not satisfy their requirements
+$settingsFile=docs_config_gfi.cfg
+FIX_LOGON ariel.a.jezierski@jpmorgan.com p JPAPI GFI -s $settingsFile
+FIX_LOGOFF ariel.a.jezierski@jpmorgan.com
+
+@fix_docs_with_custom_alias
+# Sessions are identified by the alias. Usually, the alias is just the name of the user
+# (like qa.tradera). If, however, there are two users with the same name, one of the sessions
+# must be given a custom alias. This is done via the -A flag -- although the user is qa.tradera
+# the session is identified by the customalias parameter ("myalias" by default)
+#
+$alias=qa.tradera
+$customalias=myalias
+FIX_LOGON $alias p PFXO_IPV_MD1 BGC -A $customalias
+FIX_LOGOFF $customalias
+
+@fix_docs_baseline_logon_logoff_combined
+# Combining all of the above...
+$alias=qa.tradera
+$password=p
+$senderCompID=PFXO_IPV_MD1
+$targetCompID=BGC
+$host=bgccdev1
+$fixVersion=4.4
+$settingsFile=docs_config_gfi.cfg
+FIX_LOGON $alias $password $senderCompID $targetCompID -H $host -V $fixVersion -s $settingsFile
+FIX_LOGOFF $alias

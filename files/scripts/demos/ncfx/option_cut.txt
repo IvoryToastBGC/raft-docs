@@ -1,0 +1,118 @@
+@NCFX_CUT_BUDAPEST
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.5.cut 5
+VALIDATE CACHE.$symbol.5.symbol $symbol
+VALIDATE CACHE.$symbol.5.price $price
+
+@NCFX_CUT_LONDON
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.18.cut 18
+VALIDATE CACHE.$symbol.18.symbol $symbol
+VALIDATE CACHE.$symbol.18.price $price
+
+@NCFX_CUT_NEW_YORK_TEN_AM
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.1.cut 1
+VALIDATE CACHE.$symbol.1.symbol $symbol
+VALIDATE CACHE.$symbol.1.price $price
+
+@NCFX_CUT_TWELVE_THIRTY_PM
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.3.cut 3
+VALIDATE CACHE.$symbol.3.symbol $symbol
+VALIDATE CACHE.$symbol.3.price $price
+
+@NCFX_CUT_NINE_THIRTY_AM
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.21.cut 21
+VALIDATE CACHE.$symbol.21.symbol $symbol
+VALIDATE CACHE.$symbol.21.price $price
+
+@NCFX_CUT_TOKYO_THREE_PM
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.2.cut 2
+VALIDATE CACHE.$symbol.2.symbol $symbol
+VALIDATE CACHE.$symbol.2.price $price
+
+@NCFX_CUT_WARSAW_ELEVEN_AM
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_1 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"$req_time","cutTimestamp":"$cut_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_1.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE.$symbol.4.cut 4
+VALIDATE CACHE.$symbol.4.symbol $symbol
+VALIDATE CACHE.$symbol.4.price $price
+
+@ncfx_populate_cuts
+# Add a value(s) into each cut
+NCFX_CLEAR_CACHE
+NCFX_CUT_BUDAPEST $symbol=EUR/USD $price=196.54 $cut_time=20240925-10:01:59.988 $req_time=20241030-15:53:30.767
+NCFX_CUT_BUDAPEST $symbol=CAD/JPY $price=1456.21 $cut_time=20240925-09:58:59.988 $req_time=20241030-15:53:31.767
+NCFX_CUT_LONDON $symbol=EUR/USD $price=126.13 $cut_time=20240926-10:59:59.968 $req_time=20241030-15:53:32.767
+NCFX_CUT_NEW_YORK_TEN_AM $symbol=EUR/USD $price=127.13 $cut_time=20240925-13:59:59.988 $req_time=20241030-15:53:33.767
+NCFX_CUT_TWELVE_THIRTY_PM $symbol=EUR/USD $price=128.13 $cut_time=20240925-16:29:59.988 $req_time=20241030-15:53:34.767
+NCFX_CUT_NINE_THIRTY_AM $symbol=EUR/USD $price=129.13 $cut_time=20240926-13:29:59.968 $req_time=20241030-15:53:35.767
+NCFX_CUT_TOKYO_THREE_PM $symbol=EUR/USD $price=11.00 $cut_time=20240926-06:00:59.968 $req_time=20241030-15:53:36.767
+NCFX_CUT_TOKYO_THREE_PM $symbol=AUD/CAD $price=12.00 $cut_time=20240926-06:01:59.968 $req_time=20241030-15:53:36.768
+NCFX_CUT_TOKYO_THREE_PM $symbol=EUR/CAD $price=13.00 $cut_time=20240926-06:02:59.968 $req_time=20241030-15:53:36.769
+NCFX_CUT_TOKYO_THREE_PM $symbol=USD/EUR $price=14.00 $cut_time=20240926-06:03:59.968 $req_time=20241030-15:53:36.780
+NCFX_CUT_WARSAW_ELEVEN_AM $symbol=EUR/USD $price=131.13 $cut_time=20240926-08:59:59.968 $req_time=20241030-15:53:37.767
+
+@ncfx_validate_timestamp_ignore
+# Make sure values with the SAME or PREVIOUS timestamps are ignored
+POST NCFX_2 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"20241030-15:54:30.767","cutTimestamp":"20240925-09:59:59.988","symbol":"EUR/USD","price":130.00}
+POST NCFX_3 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"20241030-15:54:30.767","cutTimestamp":"20240925-09:59:59.988","symbol":"EUR/USD","price":140.00}
+POST NCFX_4 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"20241030-15:54:36.767","cutTimestamp":"20240925-09:59:59.988","symbol":"EUR/USD","price":150.00}
+POST NCFX_5 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"20241030-15:54:30.767","cutTimestamp":"20240925-09:59:59.988","symbol":"EUR/USD","price":160.00}
+POST CACHE_2 http://nyldvfxap04:5490/raft/simulation/cuts {}
+VALIDATE CACHE_2.EUR/USD.5.cut 5
+VALIDATE CACHE_2.EUR/USD.5.symbol EUR/USD
+VALIDATE CACHE_2.EUR/USD.5.price 150.00
+
+@ncfx_test_unknown_cuts
+# Make sure an unknown cuts doesn't ruin the cache
+POST NCFX_6 http://nyldvfxap04:5490/raft/simulation/message {"type":"cut","requestTimestamp":"20241230-06:54:30.767","cutTimestamp":"20240925-02:26:59.988","symbol":"ZZZ/ZZZ","price":999.88}
+
+@ncfx_run_tests
+ncfx_populate_cuts
+ncfx_validate_timestamp_ignore
+ncfx_test_unknown_cuts

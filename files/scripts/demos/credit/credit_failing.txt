@@ -1,0 +1,10 @@
+# CreditMatch Tests: Example Requests To CreditMatch
+# OPTIONS: N/A
+
+@credit_failing_demo
+# Logging On and Logging Off
+FIX_LOGON fixmktssuperuser@boa.com test MD_01BOAFIX FIXCTSBOBGW -s docs_config_credit.cfg
+FIX_SEND fixmktssuperuser@boa.com "8=FIX.4.49=12835=BE49=MD_01BOAFIX56=FIXCTSBOBGW34=252=20241118-17:11:36.960923=RequestID4338924=1553=fixmktssuperuser@boa.com554=test10=044"
+FIX_ACK fixmktssuperuser@boa.com -p [926=1] -t 3000
+FIX_SEND fixmktssuperuser@boa.com "8=FIX.4.49=26035=D49=MD_01BOAFIX56=FIXCTSBOBGW34=1052=20241118-18:13:56.22711=NewOrder435255=BND:C>IT0005217770:I:N:OTF:AUREL54=160=20241118-18:13:56.22738=1000000040=244=89.3" -f [453 [448=fixmktssuperuser@boa.com 447=D 452=11]] -f [453 [448=QABook 447=D 452=76]] -f [386 [336=1074]]
+FIX_LOGOFF fixmktssuperuser@boa.com

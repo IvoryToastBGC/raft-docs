@@ -1,0 +1,7 @@
+@raft_docs_post_validate_mimic
+POST AK1 http://nyldvfxap02:1323/raft/mimic a
+VALIDATE AK1.message a
+POST AK2 http://nyldvfxap02:1323/raft/mimic {AK1.message}b
+VALIDATE AK2.message ab
+POST AK3 http://nyldvfxap02:1323/raft/mimic {AK2.message}c
+VALIDATE AK3.message abc

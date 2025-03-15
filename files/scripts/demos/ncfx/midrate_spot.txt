@@ -1,0 +1,19 @@
+@NCFX_CLEAR_CACHE
+POST CLEAR http://nyldvfxap04:5490/raft/simulation/midrate/clear {}
+VALIDATE CLEAR.error N/A
+
+@NCFX_MIDRATE
+$symbol=NOT/SET
+$price=0.0:<double:?>=0.0>
+$cut_time=NOT_VALID
+$req_time=NOT_VALID
+POST NCFX_MIDRATE http://nyldvfxap04:5490/raft/simulation/message {"type":"midrate","requestTimestamp":"$req_time","symbol":"$symbol","price":$price}
+VALIDATE NCFX_MIDRATE.error N/A
+POST CACHE http://nyldvfxap04:5490/raft/simulation/midrate {}
+VALIDATE CACHE.$symbol.symbol $symbol
+VALIDATE CACHE.$symbol.price $price
+
+@ncfx_midrate_spot_run
+# Add a value(s) into each cut
+NCFX_CLEAR_CACHE
+NCFX_MIDRATE $symbol=EUR/USD $price=196.54 $req_time=20241030-15:53:30.767

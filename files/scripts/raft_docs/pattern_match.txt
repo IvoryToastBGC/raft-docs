@@ -1,0 +1,124 @@
+# RAFT_DOCS: Pattern Matching Guide
+# OPTIONS: N/A
+
+
+@fix_docs_basic_pattern_match
+# The -p option starts a pattern match. If given "-p C=c", this will scan the message for the presence of the tag C with the exact value of c. In this case, we are making sure there is a "35" tag present in the message, with a value of "8"
+FIX_LOGON ragu.prabhakaran@anz.com p ANZP GFI -H cdev2 -s docs_config_gfi.cfg -i SD
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=ragu.prabhakaran@anz.com $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=21.25 $tablecode=EURUSD_1_1_0_8_3
+FIX_ACK ragu.prabhakaran@anz.com -p [35=8] -t 3000
+FIX_LOGOFF ragu.prabhakaran@anz.com
+
+
+@fix_docs_basic_pattern_negation
+# Now the opposite. The field "35" does NOT equal "10". Therefore, we can say it does NOT equal "10"
+FIX_LOGON ragu.prabhakaran@anz.com p ANZP GFI -H cdev2 -s docs_config_gfi.cfg -i SD
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=ragu.prabhakaran@anz.com $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=21.25 $tablecode=EURUSD_1_1_0_8_3
+FIX_ACK ragu.prabhakaran@anz.com -p [!35=10] -t 3000
+FIX_LOGOFF ragu.prabhakaran@anz.com
+
+
+@fix_docs_basic_pattern_ordered
+# Multiple fields in a row can be matched by joining them with a delimiter 
+# (If a delimiter is not specified with a -d flag, multiple fields must be 
+# separated by a /u0001 -- SOH -- character)
+# Note: <?> matches any string, so 8528=<?>|6215=<?> -d | simply matches
+# any message that contains fields 8528 and 6215, back to back, with any
+# value (e.g. 8528=hello|6215=world)
+# 
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC -H bgccdev1
+FIX_SEND qa.tradera 35=x|320=ID|559=0|55=ALL_ALL|263=1 -d | -F 320
+#FIX_PRINT_BUFFER qa.tradera -t 3000
+FIX_ACK qa.tradera -p 8528=<?>|6215=<?> -d | -t 10000
+FIX_LOGOFF qa.tradera
+
+
+@fix_docs_basic_pattern_and
+# Patterns can also be matched with Boolean expressions
+# Whitespace-separated patterns inside [] (square brackets) are treated as 
+# an "AND": -p [A=a B=b] matches messages that contain both A=a and B=b 
+# anywhere in the message (not necessarily next to each other or in order)
+#
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC -H bgccdev1
+FIX_SEND qa.tradera 35=x|320=ID|559=0|55=ALL_ALL|263=1 -d | -F 320
+#FIX_PRINT_BUFFER qa.tradera -t 3000
+FIX_ACK qa.tradera -p [167=<?> 8528=<?>|6215=<?>] -d | -t 10000
+FIX_LOGOFF qa.tradera
+
+
+@fix_docs_basic_pattern_or
+# Multiple -p flags are treated as an "OR"
+# If any of the given patterns is a match for a message, the check passes
+# That is -p A=a -p B=b will match messages that contain at least one of
+# A=a or B=b
+#
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC -H bgccdev1
+FIX_SEND qa.tradera 35=x|320=ID|559=0|55=ALL_ALL|263=1 -d | -F 320
+#FIX_PRINT_BUFFER qa.tradera -t 3000
+FIX_ACK qa.tradera -p 12345=fail -p [167=<?> 8528=<?>|6215=<?>] -d | -t 10000
+FIX_LOGOFF qa.tradera
+
+
+@fix_docs_wildcards_and_types
+# In the example above, field 12345=fail checks for an exact match:
+# a field 12345 with the value "fail". Fields 167 and 8528, on the other hand,
+# are allowed to match <?>, where <?> is a wildcard meaning "any" -- as long
+# as the field is present, the match is considered successful. 
+# This can be expanded -- pattern matching supports a variety of different matches
+# (see the pattern-matching guide for a complete list).
+# The standard structure is as follows <type>, <type:constraint>, <==val1,val2==>,
+# or <type:==val1,val2==>
+#
+# Values enclosed in ==val1,val2,val3== means that the field must match one of the
+# given values exactly. If a type is specified, the value must match the type. 
+# Currently supported types are char, string, int, float, bool, and timestamp; 
+# and constraints are processed differently for each type:
+#
+# char: <char:a||b||c> where || is "OR"; alternatively use <char:==a,b,c==> or <==a,b,c==>
+#
+# string: <string:regex> where the regex is standard java
+# since [, ", and ] are treated as  special characters, they must be provided 
+# using alternative syntax -- &lbrack; for [, &rbrack; for ], and &quot; for "
+# for example, the following matches field 12345 with any alphanumeric input with exactly 5-7 characters:
+# 12345=<string:^&lbrack;a-zA-Z0-9&rbrack;{5,7}$>
+#
+# int: <int:?>5&&?<=10||?==12> where "?" represents the unknown, || is an OR, && is an AND,
+# and standard operators (==, <, <=, >, >=) are supported. The scary-looking
+# pattern ?>5&&?<=10||?==12 simply means the expected value is greater than 5 and less than
+# or equal to 10 -- OR it's exactly equal to 12. Note that "ANDs" are stickier than "ORs"; 
+# in other words, ?>5&&?<=10 gets evaluated separately from ?==12
+#
+# float: identical to int, but with support for double precision floats --
+# <float:?>5.0&&?<=10||?==12.55>
+#
+# bool: <bool:true> or <bool:false> 
+# legal values are (case-insenitive): y, n, yes, no, 1, 0, t, true, f, false
+#
+# timestamp: <timestamp>, <timestamp:exact>, or <timestamp:function>
+# Like integers/floats, timestamps can be chained via &&, ||, and comparison operators
+# timestamps are special because they can process an exact time (<timestamp:12345>),
+# where the format must be readable by quickfixj, or they can be specified with 
+# a function. Supported functions are: NOW() (current timestamp), and PLUS()/MINUS()
+# where the first argument MUST be an exact value or NOW(), followed by comma-separated
+# time units (YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS, MILLIS, MICROS, NANOS)
+# For example: PLUS(NOW(),MINUTES(2),SECONDS(30)) is the current timestamp + 2 minutes, 30 seconds
+# Putting it all together, <timestamp:?>=NOW()&&?<PLUS(NOW(),SECONDS(15))> is the pattern to check 
+# for a timestamp that is greater or equal to the current system time and less than 15 seconds from now
+#
+FIX_LOGON qa.tradera p PFXO_IPV_MD1 BGC -H bgccdev1
+FIX_SEND qa.tradera 35=x|320=ID|559=0|55=ALL_ALL|263=1 -d | -F 320
+#FIX_PRINT_BUFFER qa.tradera -t 3000
+# NOTE: for timestamp comparison to work, the source and target timezones must be aligned!
+# NOTE: RAFT time defaults to UTC
+FIX_ACK qa.tradera -p 60=<timestamp:?>=MINUS(NOW(),DAYS(1))&&?<PLUS(NOW(),HOURS(5),SECONDS(15))> -d | -t 10000
+FIX_LOGOFF qa.tradera
+
+
+
+@fix_docs_basic_pattern_match_whitespace
+# What about whitespace? To have whitespace -- add quotes around the whole pattern
+# Alternatively, multi-line blocks can be enclosed in ``` ```
+FIX_LOGON ragu.prabhakaran@anz.com p ANZP GFI -H cdev2 -s docs_config_gfi.cfg -i SD
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=ragu.prabhakaran@anz.com $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=21.25 
+FIX_ACK ragu.prabhakaran@anz.com -p "!35=It Accepts This Whitespace As    Valid" -t 3000
+FIX_LOGOFF ragu.prabhakaran@anz.com

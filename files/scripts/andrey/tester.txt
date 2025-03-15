@@ -1,0 +1,10 @@
+#test_request_test
+
+@sec_test
+security_list_request_single_test $symbol=TSTMKT
+
+@sec_fail
+security_list_request_single_test $symbol=hello
+
+@sec_fail_2
+security_list_request_single_test

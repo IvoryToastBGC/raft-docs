@@ -1,0 +1,7 @@
+# RUNNERS:
+
+@andrey_runner
+# insert calls to blocks here 
+# e.g. my_func $my_arg=12345
+fix_docs_basic_pattern_and
+fix_docs_basic_pattern_or

@@ -1,0 +1,11 @@
+# RUNNERS:
+#PRINT andrey's tester runner block
+#test_request_test
+#security_list_request_single_test
+#security_list_request_all $host=bgccdev1
+#simple_trade_bgccdev1
+
+# NOTES:
+# security list reject: 8=FIX.4.49=9535=j34=249=BGC52=20250130-14:43:19.44556=PFXO_IPV_MD145=258=Unknown Security372=x380=210=214
+# security list single success: 8=FIX.4.49=62735=y34=249=BGC52=20250130-14:49:18.51456=PFXO_IPV_MD160=20250130-14:49:18.49937475=20250130167=FX320=30144916U1322=SLnyldvfxap03.cad.local-38882-1738202825520-1:6584393=1560=0893=Y146=155=TSTMKT9126=658505=89125=15159=09127=18715=128528=TSTMKT_1_2_0_8_8256215=10M8528=TSTMKT_1_2_0_8_8266215=11M8528=TSTMKT_1_2_0_8_8236215=7M8528=TSTMKT_1_2_0_8_8246215=8M8528=TSTMKT_1_2_0_8_8216215=4M8528=TSTMKT_1_2_0_8_8226215=5M8528=TSTMKT_1_2_0_8_66215=3M8528=TSTMKT_1_2_0_8_56215=2M8528=TSTMKT_1_2_0_8_46215=1M8528=TSTMKT_1_2_0_8_96215=1Y8528=TSTMKT_1_2_0_8_86215=9M8528=TSTMKT_1_2_0_8_76215=6M10=042
+#note -- every TSTMKT line available is returned (so you can index into the results, in theory)

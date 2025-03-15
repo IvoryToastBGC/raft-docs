@@ -1,0 +1,58 @@
+# NEW_ORDER_SINGLE | (D)
+# OPTIONS: N/A
+
+@forexmatch_new_order_single_baseline
+# Baseline: The WAIT command allows you to see the price appear on the NewUI screen. After you log off, the price gets reffed.
+FIX_LOGON jeff.liqa password LIQA GFI -H vqa5 -s docs_config_gfi.cfg
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=jeff.liqa $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=21.25 $timeinforce=1 $tablecode=EURUSD_1_1_0_8_3
+FIX_ACK jeff.liqa -p [35=8 39=0] -t 3000
+FIX_LOGOFF jeff.liqa
+
+@forexmatch_new_order_single_with_market_data
+# With Market Data -- Why is there a Quote Request after the Market Data?
+FIX_LOGON jeff.liqa password LIQA GFI -H vqa5 -s docs_config_gfi.cfg -i SD -i R
+MARKET_DATA_NO_ACK $alias=jeff.liqa $symbol=EURUSD
+FIX_ACK jeff.liqa -p [35=W 55=EURUSD] -t 3000
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=jeff.liqa $symbol=EURUSD $mqsize=23 $fwdprice=11.3 $volatility=11.00 $timeinforce=1 $tablecode=EURUSD_1_1_0_8_5
+FIX_ACK jeff.liqa -p [35=8 39=0] -t 3000
+FIX_ACK jeff.liqa -p [35=W 55=EURUSD 8505=8 537=1 270=11 271=23] -t 3000
+# FX_DB EXTERNAL_KEY ID
+FIX_LOGOFF jeff.liqa
+
+@forexmatch_new_order_single_reject
+# Reject
+FIX_LOGON jeff.liqa password LIQA GFI -H vqa5 -s docs_config_gfi.cfg
+NEW_ORDER_SINGLE_SELL_NO_ACK $alias=jeff.liqa $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=0.62 $timeinforce=1 $tablecode=EURUSD_1_1_0_8_4
+FIX_ACK jeff.liqa -p [35=8 39=8 8505=8 151=0 54=2 150=8 39=8 103=99 55=EURUSD 38=15] -t 3000
+FIX_LOGOFF jeff.liqa
+
+@forexmatch_new_order_single_specify_clob_price
+# Specify Clob Price of 35.75
+FIX_LOGON jeff.liqa password LIQA GFI -H vqa5 -s docs_config_gfi.cfg
+NEW_ORDER_SINGLE_SELL_NO_ACK $alias=jeff.liqa $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=35.75 $timeinforce=1 $tablecode=EURUSD_1_1_0_8_5
+FIX_ACK jeff.liqa -p [35=8 39=0] -t 3000
+FIX_LOGOFF jeff.liqa
+
+@forexmatch_new_order_single_adjust_time_in_force
+# Adjust TimeInForce Value: 0 [Day] | 1 [Good Til' Cancel] | 3 [Immediate or Cancel] | 6 [Good Til' Date]
+$timeinforce=1
+FIX_LOGON jeff.liqa password LIQA GFI -H vqa5 -s docs_config_gfi.cfg
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=jeff.liqa $symbol=EURUSD $mqsize=15 $fwdprice=11.3 $volatility=35.75 $timeinforce=$timeinforce $tablecode=EURUSD_1_1_0_8_6
+FIX_ACK jeff.liqa -p [35=8 39=0] -t 3000
+FIX_LOGOFF jeff.liqa
+
+@forexmatch_multi_trade
+# Multiple Trades
+FIX_LOGON hsbc.api p HSBC GFI -H cdev2 -s docs_config_gfi.cfg -i SD
+REPEAT [NEW_ORDER_SINGLE_BUY_NO_ACK $alias=hsbc.api $symbol=EURUSD $mqsize=15 $fwdprice=10.8 $volatility=7.50 $timeinforce=1 $tablecode=EURUSD_1_1_0_8_2] -X 5
+FIX_ACK hsbc.api -p [35=8 39=0 151=15 5678=7.5 !58=<?>] -t 3000
+FIX_ACK hsbc.api -p [35=8 39=8 151=0 5678=7.5 58=<?>] -t 3000 -M -m 4
+FIX_LOGOFF hsbc.api
+
+@forexmatch_new_order_single_demo
+forexmatch_new_order_single_baseline
+forexmatch_new_order_single_with_market_data
+forexmatch_new_order_single_reject
+forexmatch_new_order_single_specify_clob_price
+forexmatch_new_order_single_adjust_time_in_force $timeinforce=1
+forexmatch_multi_trade

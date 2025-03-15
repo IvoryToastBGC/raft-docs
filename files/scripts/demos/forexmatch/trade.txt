@@ -1,0 +1,22 @@
+@forexmatch_trade_and_validate_demo
+FIX_LOGON ragu.prabhakaran@anz.com p ANZP GFI -H cdev2 -s docs_config_gfi.cfg -i SD
+FIX_LOGON hsbc.api p HSBC GFI -H cdev2 -s docs_config_gfi.cfg -i SD
+NEW_ORDER_SINGLE_BUY_NO_ACK $alias=ragu.prabhakaran@anz.com $symbol=EURUSD $mqsize=15 $fwdprice=10.8 $volatility=6.50 $timeinforce=1 $tablecode=EURUSD_1_1_0_8_7
+FIX_ACK ragu.prabhakaran@anz.com -p [35=8 39=0 151=15] -t 3000
+NEW_ORDER_SINGLE_SELL_NO_ACK $alias=hsbc.api $symbol=EURUSD $mqsize=15 $fwdprice=10.2 $volatility=5.50 $tablecode=EURUSD_1_1_0_8_7
+FIX_ACK hsbc.api -p [35=8 39=0 151=15] -t 3000
+WAIT -t 3000
+FIX_CAPTURE ragu.prabhakaran@anz.com 5001 ANTHONY_KEY -t 3000
+PRINT_VAR ragu.prabhakaran@anz.com ANTHONY_KEY
+FIX_ACK ragu.prabhakaran@anz.com -p [35=8 39=2 151=0 5678=6.5 5001=<?>] -t 3000
+FIX_ACK hsbc.api -p [35=8 39=2 151=0 5678=6.5] -t 3000
+POST TRD http://nyldvfxap02:1323/raft/db "select external_key, trade_source, product_id, premium_type, market, aggressor_side, trade_mic from TRADE where EXTERNAL_KEY = '{ANTHONY_KEY.ACK}'"
+VALIDATE TRD.external_key "{ANTHONY_KEY.ACK}"
+VALIDATE TRD.trade_source "VOLS"
+VALIDATE TRD.product_id "1"
+VALIDATE TRD.premium_type "F"
+VALIDATE TRD.market "OTC"
+VALIDATE TRD.aggressor_side "2"
+VALIDATE TRD.trade_mic "GFSO"
+FIX_LOGOFF ragu.prabhakaran@anz.com
+FIX_LOGOFF hsbc.api
