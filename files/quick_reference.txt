@@ -1,0 +1,208 @@
+# QUICK REFERENCE
+
+# RAFT COMMANDS:
+#
+# The following commands are supported by RAFT directly.
+#
+# In the commands below, the format lists the command name, followed required parameters in angle brackets and optional
+# parameters in square brackets. Notes (if present) are provided in parentheses; if a parameter is not explicitly
+# preceded by a -flag, it is assumed to be a positional parameter that must be supplied in the order listed.
+# A * symbol indicates that a parameter can be repeated multiple times.
+#
+#
+# FIX COMMANDS:
+#
+# FIX_SEND: This command is used to send a FIX message to the server. The session must correspond to a unique alias
+# (established on logon).
+# Usage: FIX_SEND <alias> <message template (containing at least 35=<msgtype>)> [-d <delimiter>] [-f <field/group>]* [-F <auto tag>]* [-c (clear incoming buffer before sending)]
+#
+# FIX_ACK: Used to acknowledge a FIX message received from the server. The session must correspond to a unique alias
+# (established on logon).
+# Usage: FIX_ACK <alias> <-p <pattern>>* [-d <delimiter>] [-M (multi-ack)] [-m <max acks>] [-t <timeout (ms)>] [-r (repeatable)] [-i <field to ignore>]* [-C <compare method (ORDERED/ORDERED_PARTIAL)>] [-P <ignore policy (IGNORE_ALL/IGNORE_HEADERS_ONLY/IGNORE_NONE)>]
+#
+# FIX_LOGON: Used to log on to the server and create an alias for the session. If an alias is not explicitly set, the
+# username is used. Aliases MUST be unique for each live session.
+# Usage: FIX_LOGON <username> <password> <senderCompId> <targetCompId> [-A <alias>] [-s <settings file>] [-H <host (known host, e.g. bgccdev2 or server:port)>] [-V <FIX version to use (e.g. 4.4)>] [-i <ignored message type (auto-discards incoming messages with given 35=type field)>]*
+#
+# FIX_LOGON_ACK: Used to check if an alias is logged in.
+# Usage: FIX_LOGON_ACK <alias>
+#
+# FIX_LOGOFF: Used to log off from the server and remove the alias.
+# Usage: FIX_LOGOFF <alias> [-g <custom message>] [-e] (check if the incoming buffer is empty; skip logoff if not)
+#
+# FIX_LOGOFF_ACK: Used to check if an alias is logged off (inverted FIX_LOGON_ACK).
+# Usage: FIX_LOGOFF_ACK <alias>
+#
+# FIX_LOGOFF_ALL: Used to log off from the server and remove all aliases.
+# Usage: FIX_LOGOFF_ALL [-t <timeout (ms)>]
+#
+# FIX_CLEAR_BUFFER: Used to clear the incoming buffer for a given alias.
+# Usage: FIX_CLEAR_BUFFER <alias> [-t <timeout (ms)>] [-m <max messages to clear (default: unlimited)>] [-p <pattern (for conditional matching)>]* [-d <delimiter>] [-C <compare method (ORDERED/ORDERED_PARTIAL)>] [-P <ignore policy (IGNORE_ALL/IGNORE_HEADERS_ONLY/IGNORE_NONE)>]
+#
+# FIX_CLEAR_BUFFER_ACK: Used to check if the incoming buffer for a given alias is empty.
+# Usage: FIX_CLEAR_BUFFER_ACK <alias> [-t <timeout (ms)>] [-I] (invert the result -- true if buffer is NOT empty).
+#
+# FIX_PRINT_BUFFER: Used to print the incoming buffer for a given alias.
+# Usage: FIX_PRINT_BUFFER <alias> [-t <timeout (ms)>]
+#
+# FIX_CAPTURE: Used to capture a field from a FIX message associated with a given alias.
+# Usage: FIX_CAPTURE <alias> <tag to capture> <capture name> [-t <timeout (ms)>] [-o <true/false> (using outgoing buffer, default: false)] [-M] (multi-capture, if more than instance of tag possible in message) [-n <index (to capture single field instance from multi-match)>] [-d <delimiter (pattern to join all multi-match values on)>]
+#
+#
+# CONTROL FLOW:
+#
+# TRUE: Returns true.
+# Usage: TRUE
+#
+# FALSE: Returns false.
+# Usage: FALSE
+#
+# NOT: Returns the opposite of the result of the given execution result.
+# Usage: NOT <[FUNCTION]> (e.g. NOT [TRUE] or NOT [FIX_LOGON_ACK <alias>] -- NOTE: functions must be enclosed in square brackets)
+#
+# OR: Returns true if any of the given execution results are true. Short circuits on first true result.
+# Usage: OR <[FUNCTION1]> <[FUNCTION2]> (e.g. OR [TRUE] [FALSE] or OR [FIX_LOGON_ACK <alias>] [FIX_LOGOFF_ACK <alias>])
+#
+# IF: Given condition function, executes true/false path depending on whether condition succeeded.
+# Usage: IF <[CONDITION COMMAND/FUNCTION]> [[SUCCESS: COMMAND1/FUNCTION1]] [[COMMAND2/FUNCTION2]] (note -- any text is permitted between brackets, most commonly IF [condition] THEN [true path] ELSE [false path])
+#
+# REPEAT: Repeat a function a specified number of times. If any intermediate result returns failure, break immediately.
+# Note: Early breaking can be avoided by wrapping command in IF []
+# Usage: REPEAT <[COMMAND/FUNCTION]> <-X <count>>
+#
+# WAIT: Pauses RAFT for specified length of time.
+# Usage: WAIT <-t <timeout (ms)>>
+#
+# SKIP_PREPROCESSOR: Bypasses compile-time checks/translation on provided function.
+# Usage: SKIP_PREPROCESSOR <[COMMAND/FUNCTION]>
+#
+#
+# POST-VALIDATE:
+#
+# POST: Sends a POST message to a given endpoint; stores reply in supplied key.
+# Usage: POST <key> <endpoint> <message>
+#
+# VALIDATE: Checks if provided message matches the curernt value in supplied key.
+# Usage: VALIDATE <key (key.field)> <expected value>
+#
+#
+# MISCELLANEOUS:
+#
+# PRINT_VAR: Prints the current value of a live variable given the session alias (user) and variable name.
+# Usage: PRINT_VAR <alias> <variable name> [-n <index to use for lookup (if multiple, delimiter-separated values expected)] [-d <delimiter (if delimiter is present, treat stored variable values as an array>]
+#
+# PRINT: Prints the given tokens.
+# Usage: PRINT [token]* [-o <outstream (if provided, will also attempt to write given tokens to file>]
+
+
+# SPECIAL PATTERNS:
+#
+# The following special patterns are used to match specific characters in the input:
+#
+# '\n' = &newline;
+# ' ' = &space;
+# '$' = &dollar;
+# '%' = &percent;
+# '&' = &amp;
+# '#' = &hash;
+# '=' = &eq;
+# '[' = &lbrack;
+# ']' = &rbrack;
+# 'SoH' = &fixdelim; ('\u0001')
+# '"' = &quote;
+# '<' = &lt;
+# '>' = &gt;
+# '|' = &pipe;
+# '{' = &lcurl;
+# '}' = &rcurl;
+# ':' = &colon;
+# '-' = &dash;
+# ';' = &semicolon;
+# '_' = &underscore;
+# "'" = &apostrophe;
+# '\\' = &backslash;
+# '/' = &frontslash;
+# '`' = &backtick;
+# ',' = &comma;
+#
+# Additionally, the following characters are replaced with their Unicode equivalents:
+# '<' = "\u003C"; (NOTE: This is a special character in HTML)
+# '>' = "\u003E"; (NOTE: This is a special character in HTML)
+
+
+# RAFT ENDPOINTS:
+#
+# / : Home page
+# /help : Help information
+# /docs : Help information
+# /retrieve : Lists all available RAFT run logs in CDS
+# /retrieve/raft : Lists all available RAFT run logs in CDS
+# /retrieve/ls/raft : Lists all available RAFT run logs in CDS
+# /retrieve/raft/{log_name} : Returns the contents of a specific RAFT run log from CDS
+# /retrieve/raft/cat/{log_name} : Returns the contents of a specific RAFT run log from CDS
+# /retrieve/latest : Returns the contents of the latest RAFT run log on CDS
+# /retrieve/ls : Lists all available logs in CDS
+# /retrieve/script/{log_folder}/{log_name} : Returns the contents of a specific script log on CDS
+# /retrieve/latest/{log_folder} : Returns the contents of the latest report for the given folder on CDS
+# /retrieve/run/raft : Reruns the latest RAFT run log on CDS and retrieves the results (warning: assumes single-threaded access!)
+# /retrieve/run/script/{log_name} : Reruns a specific RAFT run log on CDS and retrieves the results (warning: assumes single-threaded access!)
+# /internal/posts : todo
+# /validate/ : todo
+# /validate/{id} : todo
+# /execute/{name} : Executes a named block directly (assumes all named blocks are unique)
+# /execute/{script_id}/{name} : Executes a named block based on full block name (e.g. 1/block_name)
+# /execute/lookup/{script_name}/{name} : Executes a named block based on full block name (with name lookup, e.g. script_name/block_name)
+# /run/script/{id} : Runs all the blocks within a script based on its ID
+# /run/script/all/{id} : Runs all the blocks within a script based on its ID
+# /run/script/named/{id} : Runs only the named blocks within a script based on its ID
+# /run/script/unnamed/{id} : Runs only the unnamed blocks within a script based on its ID
+# /run/script/anonymous/{id} : Runs only the unnamed blocks within a script based on its ID
+# /run/script/lookup/{name} : Runs all the blocks within a script based on its name
+# /run/script/lookup/all/{name} : Runs all the blocks within a script based on its name
+# /run/script/lookup/named/{name} : Runs only the named blocks within a script based on its name
+# /run/script/lookup/unnamed/{name} : Runs only the unnamed blocks within a script based on its name
+# /run/script/lookup/anonymous/{name} : Runs only the unnamed blocks within a script based on its name
+# /run/collection/{collection_id} : Runs all the scripts within a collection based on its ID
+# /run/collection/all/{collection_id} : Runs all the scripts within a collection based on its ID
+# /run/collection/named/{collection_id} : Runs only the named scripts within a collection based on its ID
+# /run/collection/unnamed/{collection_id} : Runs only the unnamed scripts within a collection based on its ID
+# /run/collection/anonymous/{collection_id} : Runs only the unnamed scripts within a collection based on its ID
+# /run/collection/lookup/{name} : Runs all the scripts within a collection based on its name
+# /run/collection/lookup/all/{name} : Runs all the scripts within a collection based on its name
+# /run/collection/lookup/named/{name} : Runs only the named scripts within a collection based on its name
+# /run/collection/lookup/unnamed/{name} : Runs only the unnamed scripts within a collection based on its name
+# /run/collection/lookup/anonymous/{name} : Runs only the unnamed scripts within a collection based on its name
+# /run/all : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /run/all/all : Runs all the scripts within all collections; all blocks (named and unnamed) are executed.
+# /run/all/named : Runs all the scripts within all collections; only named blocks are executed.
+# /run/all/unnamed : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /run/all/anonymous : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /run/all/default : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /run/default : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /run/named : Runs all the scripts within all collections; only named blocks are executed
+# /run/unnamed : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /run/anonymous : Runs all the scripts within all collections: note that by default only unnamed blocks (callers) are invoked
+# /analyze/fix : todo
+# /analyze/script : todo
+# /state : Returns the current state of the system (collections/scripts/translated blocks available) and the details (names, variable information, and executables) associated with all blocks
+# /state/raw : Returns the raw state of the system (debugging)
+# /state/callable : Returns the callable named blocks (ones that can be executed directly via /execute/{name})
+# /state/named : Returns the details (names, variable information, and executables) associated with all named blocks
+# /state/headers : Returns the headers (names and variable information) of all named blocks
+# /state/details : Returns the details (names, variable information, and executables) associated with all named blocks
+# /state/named/headers : Returns the headers (names and variable information) of all named blocks
+# /state/named/details : Returns the details (names, variable information, and executables) associated with all named blocks
+# /state/unnamed : Returns the details (executable lines) associated with all unnamed blocks; note that these blocks cannot be accessed directly, but can be executed
+# /state/anonymous : Returns the details (executable lines) associated with all unnamed blocks; note that these blocks cannot be accessed directly, but can be executed
+# /state/unnamed/details : Returns the details (executable lines) associated with all unnamed blocks; note that these blocks cannot be accessed directly, but can be executed
+# /state/anonymous/details : Returns the details (executable lines) associated with all unnamed blocks; note that these blocks cannot be accessed directly, but can be executed
+# /state/all : Returns the current state of the system (collections/scripts/translated blocks available) and the details (names, variable information, and executables) associated with all blocks
+# /state/all/headers : Returns the headers (names and variable information) of all blocks (named and unnamed)
+# /state/all/details : Returns the current state of the system (collections/scripts/translated blocks available) and the details (names, variable information, and executables) associated with all blocks
+# /state/translate : Returns the translated blocks (i.e. blocks with function calls and variables replaced with executable lines) associated with all blocks
+# /state/translate/all : Returns the translated blocks (i.e. blocks with function calls and variables replaced with executable lines) associated with all blocks
+# /state/translate/named : Returns the translated blocks (i.e. blocks with function calls and variables replaced with executable lines) associated with all named blocks
+# /state/translate/unnamed : Returns the translated blocks (i.e. blocks with function calls and variables replaced with executable lines) associated with all unnamed blocks
+# /state/translate/anonymous : Returns the translated blocks (i.e. blocks with function calls and variables replaced with executable lines) associated with all unnamed blocks
+# /state/collection/update : todo
+# /state/script/update: todo
