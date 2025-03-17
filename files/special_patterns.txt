@@ -1,0 +1,32 @@
+# SPECIAL PATTERNS:
+#
+# '\n' = &newline;
+# ' ' = &space;
+# '$' = &dollar;
+# '%' = &percent;
+# '&' = &amp;
+# '#' = &hash;
+# '=' = &eq;
+# '[' = &lbrack;
+# ']' = &rbrack;
+# 'SoH' = &fixdelim; ('\u0001')
+# '"' = &quote;
+# '<' = &lt;
+# '>' = &gt;
+# '|' = &pipe;
+# '{' = &lcurl;
+# '}' = &rcurl;
+# ':' = &colon;
+# '-' = &dash;
+# ';' = &semicolon;
+# '_' = &underscore;
+# "'" = &apostrophe;
+# '\\' = &backslash;
+# '/' = &frontslash;
+# '`' = &backtick;
+# ',' = &comma;
+#
+# Additionally, the following characters are replaced with their Unicode equivalents:
+# '<' = "\u003C"; (NOTE: This is a special character in HTML)
+# '>' = "\u003E"; (NOTE: This is a special character in HTML)
+
