@@ -206,3 +206,90 @@
 # /state/translate/anonymous : Returns the translated blocks (i.e. blocks with function calls and variables replaced with executable lines) associated with all unnamed blocks
 # /state/collection/update : todo
 # /state/script/update: todo
+
+# KNOWN FIX HOSTS
+#
+# The following is a list of known FIX hosts that can be used with the FIX_LOGON command (without server:port syntax):
+#
+# bgccdev1 (at nyldvfxap03:20000)
+# bgccdev2 (at nyldvfxap04:20000)
+# cdev1 (at nyldvfxap01:20000)
+# cdev2 (at nyldvfxap02:20000)
+# qa3 (at nylqfxap05:20000)
+# vqa1 (at nylqvfxap08:20800)
+# vqa2 (at nylqvfxap02:20800)
+# vqa3 (at nylqvfxap03:20800)
+# vqa4 (at nylqvfxap04:20800)
+# vqa5 (at nylqvfxap05:20800)
+# vqa6 (at nylqvfxap06:20800)
+# vqa7 (at nylqvfxap07:20800)
+# vqa8 (at nylqvfxap01:20800)
+# bgcstg1 (at ny4lsvfx03:20000)
+# bgcstg2 (at ny4lsvfx04:20000)
+# estg1 (at ny4lsvfx01:20000)
+# estg2 (at ny4lsvfx02:20000)
+
+
+# CONFIGURABLE SETTINGS
+#
+# The following is a list of settings that can be adjusted to modify RAFT's behavior. Note: many settings are inherited
+# from QuickFIX/J, and are not listed here. For a full list of QuickFIX/J settings, please refer to the QuickFIX/J
+# documentation at https://www.quickfixj.org/usermanual/2.3.0/usage/configuration.html
+#
+# Note that settings below must be specified under a [DEFAULT] header, rather than a [SESSION] header. Settings can
+# be overridden on a per-session basis by using the -s flag in the FIX_LOGON command with the path to a settings file.
+#
+# Some relevant QuickFIX/J settings include:
+#
+# ConnectionType: The type of FIX connection to establish (RAFT must run as initiator).
+# SocketConnectHost: The default FIX host to connect to.
+# SocketConnectPort: The default FIX port to connect to.
+# TimeZone: The timezone to use for FIX timestamps (default UTC).
+# HeartBtInt: The FIX heartbeat interval in seconds (BGC defaults to 10)
+# DataDictionary: The data dictionary associated with the FIX spec to test (e.g. fixapi.msg44.xml)
+# ScreenLogShowIncoming (Y/N): Select whether to display incoming messages (i.e. dump incoming to terminal screen).
+# ScreenLogShowOutgoing (Y/N): Select whether to display outgoing messages (i.e. dump outgoing to terminal screen).
+# ScreenLogShowEvent (Y/N): Select whether to display event messages (i.e. dump events to terminal screen).
+# ScreenLogShowHeartBeats (Y/N): Select whether to display heartbeat messages (i.e. dump heartbeats to terminal screen).
+#
+# RAFT-specific settings include:
+#
+# StandardLibrary: The path to the standard library file (default stdlib.txt). The standard library contains some common
+# RAFT building blocks that can be used in scripts (e.g. common FIX message templates).
+#
+# RaftPort: The port to use for RAFT's API. This is the port that the RAFT server listens on for incoming requests.
+#
+# RaftBlockCacheSize: The size of the block cache used by RAFT. This cache stores translated blocks for reuse. That is,
+# if @block is called, the block is translated (e.g. to commands A, B, C) and stored in the cache.
+# If @block is called again (with the same parameters, if any are present), the cached version of the block is used.
+# The RaftBlockCacheSize setting determines the maximum number of translated blocks that can be stored in the cache.
+#
+# RaftAnnotatorCacheSize: The size of the annotator cache used by RAFT. Multiple annotators can be stored in the cache
+# simultaneously (annotator id : annotator). Script annotators contain the entire current in-memory structure of
+# all scripts; caching the annotators allows for retrieval of the annotator later. The RaftAnnotatorCacheSize setting
+# determines the maximum number of annotator ids that can be stored in the cache.
+#
+# RaftMaxBlockTranslationDepth: The maximum depth of block translation that RAFT will allow. This setting is used to
+# limit the depth of nested function calls: e.g. if func1 calls func2, the depth is 2. This setting terminates the
+# RAFT if the maximum depth is exceeded.
+#
+# RaftMaxNumOfFixSessions: The maximum number of FIX sessions that RAFT will allow to be active simultaneously.
+#
+# RaftFixBufferCapacityPerSession: The maximum number of FIX messages that RAFT will allow to be stored in the incoming
+# message buffer. The buffer can be cleared via FIX_CLEAR_BUFFER or FIX_ACK commands.
+#
+#
+# CDS connection settings (certain endpoints allow querying/retrieving reports from CDS):
+#
+# CDSHost: The host to use for CDS connections.
+#
+# CDSTimeout: The timeout to use for CDS connections.
+#
+# CDSReportsPath: The path to the report runner directory on CDS.
+#
+# CDSReportOutputPath: The path to the report output directory on CDS.
+#
+# RaftRunAllHourlyCDS: The name of the hourly report to run on CDS.
+#
+# RaftRunAllNowCDS: The name of the immediate "runAll" report to run on CDS.
+
