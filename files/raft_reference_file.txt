@@ -1,0 +1,21 @@
+@simple_trade
+# REMEMBER TO SET PERMISSIONS IN ADMIN
+# also, log in as the right person and add pod (like eurusd fwd or whatnot)
+$user1
+$user2
+$pass1=p
+$pass2=p
+$sender1
+$sender2
+$target=BGC
+$host
+FIX_LOGON $user1 $pass1 $sender1 $target -H $host
+FIX_LOGON $user2 $pass2 $sender2 $target -H $host
+NEW_ORDER_SINGLE_SELL $alias=$user2 $symbol=EURUSD $mqsize=1000 $fwdprice=15 $volatility=12.3 $tablecode=EURUSD_25_4_0_8_4
+MARKET_DATA $alias=$user1
+WAIT -t 1000
+FIX_PRINT_BUFFER $user1
+FIX_PRINT_BUFFER $user2
+NEW_ORDER_SINGLE_BUY $alias=$user1 $symbol=EURUSD $mqsize=1000 $fwdprice=15 $volatility=12.3 $tablecode=EURUSD_25_4_0_8_4
+WAIT -t 1000
+FIX_PRINT_BUFFER $user1
